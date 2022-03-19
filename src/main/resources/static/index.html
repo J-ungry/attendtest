@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Attendance service</title>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@500&display=swap" rel="stylesheet">
+    <style></style>
+    <script>
+
+        function writePost(){} //메모 생성하는 과정 (POST 로 메모 안에 내용 보내주자 DB 로 내용 전송해주기)
+        /*
+        $(document).ready(function(){
+        //HTML 로드할때마다 실행하기
+            getMessages();
+        })
+         */
+        function checkPw(){} //비밀번호 맞는지 확인하는 함수
+        function editPost(id){
+            showEdits(id);
+        } //수정 버튼 눌렀을때 작동해야함 (pw 확인 창 띄워주는 역할 해야함
+        function showEdits(id){
+            $(`#${id}-checkPw`).show();
+        }
+        function deletePost(){}
+        function submitPost(){}
+    </script>
+</head>
+<body>
+<div class="background-header">
+
+</div>
+<div class="background-body">
+
+</div>
+<div class="wrap">
+    <div class="header">
+        <h2>Attendance Service</h2>
+        <p>
+            우리도 갓생 살아보자
+        </p>
+    </div>
+    <div class="area-write">
+        <form>
+            Username: <input type="text"><br>
+            Password: <input type="password">
+        </form>
+        <textarea class="field" placeholder="오늘의 다짐 한마디" name="contents" id="contents" cols="30" rows="10"></textarea>
+        <img src="images/send.png" alt="" onclick="writePost()">
+    </div>
+    <div id="cards-box" class="area-read">
+        <div class="card">
+            <div class="metadata">
+                <div class="date">
+                    March 19 , 2022
+                </div>
+                <div id="1-username" class="username">
+                    Jungry
+                </div>
+            </div>
+            <div class="contents">
+                <div id="1-contents" class="text">
+                    Insert Contents Here
+                </div>
+                <div id="1-checkPw">
+                    <form>
+                        Password: <input type="password">
+                        <input type="button" onclick="checkPw()" value="확인">
+                    </form>
+                </div>
+                <div id="1-editarea" class="edit">
+                    <textarea name="" id="1-textarea" cols="30" rows="5" class="te-edit"></textarea>
+                </div>
+            </div>
+            <!-- Button Area-->
+            <div class="footer">
+                <img src="images/edit.png" alt="" id="1-edit" onclick="editPost('1')">
+                <img src="images/delete.png" alt="" id="1-delete" onclick="deletePost('1')">
+                <img src="images/submit.png" alt="" id="1-submit" onclick="submitPost('1')">
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
