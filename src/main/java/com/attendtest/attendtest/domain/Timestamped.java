@@ -10,8 +10,9 @@ import javax.persistence.MappedSuperclass;
 import java.time.LocalDateTime;
 
 @Getter
-@MappedSuperclass
+@MappedSuperclass //자동으로 생성, 수정시간 컬럼으로 인식하게 해줌
 @EntityListeners(AuditingEntityListener.class) //이게 뭐였지 ??
+
 public abstract class Timestamped {
 
     @CreatedDate

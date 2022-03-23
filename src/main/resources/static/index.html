@@ -11,30 +11,176 @@
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@500&display=swap" rel="stylesheet">
     <style></style>
     <script>
-        function hideEdits(){
-            $(`#1-checkPw`).hide();
-            $(`#1-editarea`).hide();
+        function isValidContents(contents){}
+        function hideEdits(id){
+            $(`#${id}-checkPw`).hide();
+            $(`#${id}-editarea`).hide();
+            $(`#${id}-submit`).hide();
         }
-        function writePost(){} //메모 생성하는 과정 (POST 로 메모 안에 내용 보내주자 DB 로 내용 전송해주기)
+        function writePost(){
+            let contents = $('#contents').val();
+            let username = $('#username').val();
+            let password = $('#password').val();
+
+            if (isValidContents(contents) == false){
+                return;
+            }
+
+            let data = {'username':username,'password':password,'contents':contents};
+
+            $.ajax({
+                type:"POST",
+                url:"/api/memos",
+                contentType:"application/json",
+                data:JSON.stringify(data),
+                success:function(response){
+                    alert("성공적으로 작성되었습니다");
+                    window.location.reload();
+                }
+            });
+        } //메모 생성하는 과정 (POST 로 메모 안에 내용 보내주자 DB 로 내용 전송해주기)
 
         $(document).ready(function(){
         //HTML 로드할때마다 실행하기
-            //getMessages();
-            hideEdits();
+            getMessages();
         })
 
         function getMessages(){
-            $('#cards-box').empty();
+            $('#cards-box').empty(); //기존 내용 싹 지우기
+            //메모 목록 불러와서 HTML 로 붙이기
+            $.ajax({
+                type:'GET',
+                url:'/api/memos',
+                success:function(response){ //list 의 형태로 반환
+                    for(let i=0; i<response.length; i++){
+                        let memo = response[i];
+                        let id = memo.id;
+                        let username = memo.username;
+                        let contents = memo.contents;
+                        let modifiedAt = memo.modifiedAt;
+                        addHTML(id,username,contents,modifiedAt);
+                    }
+                }
+            })
         }
-        function checkPw(id){} //비밀번호 맞는지 확인하는 함수
+        function addHTML(id,username,contents,modifiedAt){
+            let tempHtml = `<div class="card">
+            <div class="metadata">
+                <div class="date">
+                    ${modifiedAt}
+                </div>
+                <div id="${id}-username" class="username">
+                    ${username}
+                </div>
+            </div>
+            <div class="contents">
+                <div id="${id}-contents" class="text">
+                    ${contents}
+                </div>
+                <div id="${id}-checkPw">
+                    <form>
+                        Password: <input type="password" id="${id}-password">
+                        <input type="button" onclick="checkPw('${id}')" value="확인">
+                    </form>
+                </div>
+                <div id="${id}-editarea" class="edit">
+                    <textarea name="" id="${id}-textarea" cols="30" rows="5" class="te-edit"></textarea>
+                </div>
+            </div>
+            <!-- Button Area-->
+            <div class="footer">
+                <img src="images/edit.png" alt="" id="${id}-edit" onclick="editPost('${id}')">
+                <img src="images/delete.png" alt="" id="${id}-delete" onclick="checkDeletePost('${id}')">
+                <img src="images/done.png" alt="" id="${id}-submit" onclick="submitPost('${id}')">
+            </div>
+        </div>`
+
+            //#cards-box 에 붙이기
+            $('#cards-box').append(tempHtml);
+            hideEdits(id);
+        }
+        function checkPw(id){
+            var pw = document.getElementById(`${id}-password`).value;
+            $.ajax({
+                type:'GET',
+                url:'api/memos',
+                success:function(response){
+                    let memo = response[id-1];
+                    let password = memo.password;
+
+                    if(pw === password){
+                        showEdit(id);
+                    }
+                    else{
+                        alert("님 비번 틀리심 ;;;");
+                    }
+
+                }
+            })
+
+        } //비밀번호 맞는지 확인하는 함수
+
+        function showEdit(id){ //비밀번호 맞을때 pw 창 가려주고 Edit 창 나오게 해줘야함
+            $(`#${id}-checkPw`).hide();
+            $(`#${id}-editarea`).show();
+            $(`#${id}-submit`).show();
+            $(`#${id}-delete`).show();
+
+            $(`#${id}-contents`).hide();
+            $(`#${id}-edit`).hide();
+
+            let contents = $(`#${id}-contents`).text().trim();
+            $(`#${id}-textarea`).val(contents);
+        }
         function editPost(id){
-            showEdits(id);
-        } //수정 버튼 눌렀을때 작동해야함 (pw 확인 창 띄워주는 역할 해야함
-        function showEdits(id){
             $(`#${id}-checkPw`).show();
+            $(`#${id}-edit`).hide();
+            $(`#${id}-delete`).hide();
+        } //수정 버튼 눌렀을때 작동해야함 (pw 확인 창 띄워주는 역할 해야함
+
+        function checkDeletePost(id){
+
         }
-        function deletePost(){}
-        function submitPost(){}
+        function deletePost(id){
+            $.ajax({
+                type:"DELETE",
+                url:`/api/memos/${id}`,
+                success:function(response){
+                    alert("삭제 완료쓰");
+                    window
+                }
+            })
+        }
+        function submitPost(id){
+            $.ajax({
+                type:"GET",
+                url:"/api/memos",
+                success:function(response){
+                    let memo = response[id-1];
+                    let password = memo.password;
+                    submit(id,password);
+                }
+
+            })
+
+        }
+        function submit(id,password){
+            let username = $(`#${id}-username`).text().trim(); //읽기 모드일때의 값 가져오기
+            let contents = $(`#${id}-textarea`).val().trim(); //쓰기 모드일때의 값 가져오기
+
+            let data = {'username':username,'contents':contents,'password':password};
+
+            $.ajax({
+                type:'PUT',
+                url:`/api/memos/${id}`,
+                data:JSON.stringify(data),
+                contentType: 'application/json',
+                success:function(response){
+                    alert('변경 완료');
+                    window.location.reload();
+                }
+            });
+        }
     </script>
 </head>
 <body>
@@ -53,8 +199,8 @@
     </div>
     <div class="area-write">
         <form>
-            Username: <input type="text"><br>
-            Password: <input type="password">
+            Username: <input type="text" id="username"><br>
+            Password: <input type="password" id="password">
         </form>
         <textarea class="field" placeholder="오늘의 다짐 한마디" name="contents" id="contents" cols="30" rows="10"></textarea>
         <img src="images/send.png" alt="" onclick="writePost()">
@@ -75,7 +221,7 @@
                 </div>
                 <div id="1-checkPw">
                     <form>
-                        Password: <input type="password">
+                        Password: <input type="password" id="1-password">
                         <input type="button" onclick="checkPw('1')" value="확인">
                     </form>
                 </div>
@@ -86,8 +232,8 @@
             <!-- Button Area-->
             <div class="footer">
                 <img src="images/edit.png" alt="" id="1-edit" onclick="editPost('1')">
-                <img src="images/delete.png" alt="" id="1-delete" onclick="deletePost('1')">
-                <img src="images/send.png" alt="" id="1-submit" onclick="submitPost('1')">
+                <img src="images/delete.png" alt="" id="1-delete" onclick="checkDeletePost('1')">
+                <img src="images/done.png" alt="" id="1-submit" onclick="submitPost('1')">
             </div>
         </div>
     </div>

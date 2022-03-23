@@ -6,8 +6,9 @@ import lombok.NoArgsConstructor;
 import javax.persistence.*;
 
 @Getter
-@NoArgsConstructor
-@Entity
+@NoArgsConstructor //생성자 기본으로 맨들기
+@Entity //테이블과 연계됨을 알려주깅
+
 public class Memo extends Timestamped {
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Id
