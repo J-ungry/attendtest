@@ -9,13 +9,35 @@
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@500&display=swap" rel="stylesheet">
-    <style></style>
+    <style>
+        body{
+            margin:0px;
+        }
+        #contents{
+            width:538px;
+        }
+        .area-write{
+            position:relative;
+            width : 538px;
+        }
+    </style>
     <script>
-        function isValidContents(contents){}
+        function isValidContents(contents){
+            if (contents==''){
+                alert('내용 입력 해주세욤');
+                return false;
+            }
+            if (contents.trim().length>140){
+                alert('글이 넘 길어요 140자 이내로 해줘요');
+                return false;
+            }
+            return true;
+        }
         function hideEdits(id){
             $(`#${id}-checkPw`).hide();
             $(`#${id}-editarea`).hide();
             $(`#${id}-submit`).hide();
+            $(`#${id}-deletePw`).hide();
         }
         function writePost(){
             let contents = $('#contents').val();
@@ -83,6 +105,12 @@
                         <input type="button" onclick="checkPw('${id}')" value="확인">
                     </form>
                 </div>
+                <div id="${id}-deletePw">
+                    <form>
+                        Password: <input type="password" id="${id}-deletePassword">
+                        <input type="button" onclick="deletePost('${id}')" value="삭제하기">
+                    </form>
+                </div>
                 <div id="${id}-editarea" class="edit">
                     <textarea name="" id="${id}-textarea" cols="30" rows="5" class="te-edit"></textarea>
                 </div>
@@ -124,7 +152,7 @@
             $(`#${id}-checkPw`).hide();
             $(`#${id}-editarea`).show();
             $(`#${id}-submit`).show();
-            $(`#${id}-delete`).show();
+            //$(`#${id}-delete`).show();
 
             $(`#${id}-contents`).hide();
             $(`#${id}-edit`).hide();
@@ -138,8 +166,10 @@
             $(`#${id}-delete`).hide();
         } //수정 버튼 눌렀을때 작동해야함 (pw 확인 창 띄워주는 역할 해야함
 
-        function checkDeletePost(id){
-
+        function checkDeletePost(id){ //비번창 띄워줘야함
+            $(`#${id}-deletePw`).show();
+            $(`#${id}-edit`).hide();
+            $(`#${id}-delete`).hide();
         }
         function deletePost(id){
             $.ajax({
@@ -147,7 +177,7 @@
                 url:`/api/memos/${id}`,
                 success:function(response){
                     alert("삭제 완료쓰");
-                    window
+                    window.location.reload();
                 }
             })
         }
@@ -223,6 +253,12 @@
                     <form>
                         Password: <input type="password" id="1-password">
                         <input type="button" onclick="checkPw('1')" value="확인">
+                    </form>
+                </div>
+                <div id="1-deletePw">
+                    <form>
+                        Password: <input type="password" id="1-deletePassword">
+                        <input type="button" onclick="deletePost('1')" value="삭제하기">
                     </form>
                 </div>
                 <div id="1-editarea" class="edit">
